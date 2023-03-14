@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>History</title>
+  <!-- Thêm các thẻ CSS của Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- Thêm các thẻ JavaScript của Bootstrap -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/jquery.knob/1.2.13/jquery.knob.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 8px;
+      border: 1px solid #ddd;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  </style>
+  <script>
+    $(document).ready( function () {
+      $('#history-table').DataTable();
+    });
+  </script>
+</head>
+
+<body>
+  {{> menu}}
+  <div class="container mt-5">
+    <h1>History</h1>
+    <table id="history-table" class="table table-striped mt-3">
+      <thead>
+        <tr>
+          <th>Distance</th>
+          <th>Average</th>
+          <th>Temperature</th>
+          <th>Humidity</th>
+          <th>Warning</th>
+          <th>Date Time</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{#each historyData}}
+    <tr>
+      <td>{{this.distance}}</td>
+      <td>{{this.average}}</td>
+      <td>{{this.temperature}}</td>
+      <td>{{this.humidity}}</td>
+      <td>{{this.warning}}</td>
+      <td>{{this.date}} {{this.time}}</td>
+
+    </tr>
+    {{/each}}
+      </tbody>
+    </table>
+  </div>
+</body>

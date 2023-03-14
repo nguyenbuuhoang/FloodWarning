@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>charts</title>
+  <!-- Thêm các thẻ CSS của Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- Thêm các thẻ JavaScript của Bootstrap -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/jquery.knob/1.2.13/jquery.knob.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+  <style>
+    #chart-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  {{> menu}}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div id="chart-container" class="card">
+                    <div class="card-body">
+                        <canvas id="dayChart" style="width:100%;max-width:700px"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <h5>Biểu đồ theo ngày</h5>
+        </div>
+    </div>
+  <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div id="chart-container" class="card">
+                    <div class="card-body">
+                        <canvas id="overollChart" style="width:100%;max-width:700px"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <h5>Biểu đồ từ trước đến nay</h5>
+        </div>
+    </div>
+  <script>
+$(document).ready(() => {
+  // Get the data from the server
+  $.get('/charts-data', (data) => {
+    // Extract the data for the overall chart
+    const overallChartData = [];
+    const overallChartLabels = [];
+    Object.keys(data).forEach((key) => {
+      overallChartData.push(data[key].average);
+      const date = new Date(`${data[key].date} ${data[key].time}`);
+      overallChartLabels.push(`${date.toLocaleDateString()} ${date.toLocaleTimeString()}`);
+    });
+
+    // Create the overall chart
+    new Chart("overollChart", {
+      type: "line",
+      data: {
+        labels: overallChartLabels,
+        datasets: [{
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgba(0,0,255,1.0)",
+          borderColor: "rgba(0,0,255,0.1)",
+          data: overallChartData
+        }]
+      },
+      options: {
+        legend: {display: false},
+        scales: {
+          yAxes: [{ticks: {min: 0, max:200}}],
+          xAxes: [{display: false}]
+        }
+      }
+    });
+
+    // Extract the data for the day chart
+    const dayChartData = [];
+    const dayChartLabels = [];
+    Object.keys(data).forEach((key) => {
+      const date = new Date(`${data[key].date} ${data[key].time}`);
+      if (date.getDate() === new Date().getDate()) {
+        dayChartData.push(data[key].average);
+        dayChartLabels.push(`${date.toLocaleDateString()} ${date.toLocaleTimeString()}`);
+      }
+    });
+
+    // Create the day chart
+    new Chart("dayChart", {
+      type: "line",
+      data: {
+        labels: dayChartLabels,
+        datasets: [{
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgba(0,0,255,1.0)",
+          borderColor: "rgba(0,0,255,0.1)",
+          data: dayChartData
+        }]
+      },
+      options: {
+        legend: {display: false},
+        scales: {
+          yAxes: [{ticks: {min: 0, max:200}}],
+          xAxes: [{display: false}]
+        }
+      }
+    });
+  });
+});
+  </script>
+</body>
+
+</html>

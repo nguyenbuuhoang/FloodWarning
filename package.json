@@ -1,0 +1,28 @@
+{
+  "engines": {
+    "node": "14.x"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.2",
+    "chart.js": "^4.2.1",
+    "datatables.net": "^1.13.4",
+    "express": "^4.18.2",
+    "express-handlebars": "^5.3.0",
+    "express-session": "^1.17.3",
+    "firebase": "^9.17.2",
+    "firebase-admin": "^11.5.0",
+    "firebase-functions": "^4.2.1",
+    "firestore": "^1.1.6",
+    "handlebars": "^4.7.7",
+    "http": "^0.0.1-security",
+    "nodemailer": "^6.9.1",
+    "np-knob": "^2.0.1",
+    "react-knob": "^0.1.0",
+    "socket.io": "^4.6.0"
+  }
+}

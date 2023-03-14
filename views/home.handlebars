@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flood warning</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/jquery.knob/1.2.13/jquery.knob.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    .dial-container {
+      display: inline-block;
+      margin-right: 25px;
+      margin-bottom: 25px;
+    }
+    
+  </style>
+</head>
+
+<body>
+  {{> menu}}
+  <div class="container">
+    <h1 class="text-center my-5">HỆ THỐNG CẢNH BÁO LŨ</h1>
+    <div class="row">
+      <div class="col-3">
+        <div class="dial-container">
+          <input id="distance" type="text" class="dial" data-min="0" data-max="200" data-width="200" data-height="200"
+            data-thickness=".2" data-fgColor="#66CC66" data-displayPrevious=true readonly>
+          <p class="text-center"><label>Khoảng cách (cm)</label></p>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="dial-container">
+          <input id="average" type="text" class="dial" data-min="0" data-max="200" data-width="200" data-height="200"
+            data-thickness=".2" data-fgColor="#FF6699" data-displayPrevious=true readonly>
+          <p class="text-center"><label>Trung bình</label></p>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="dial-container">
+          <input id="temperature" type="text" class="dial" data-min="0" data-max="100" data-width="200"
+            data-height="200" data-thickness=".2" data-fgColor="#FFCC33" data-displayPrevious=true readonly>
+          <p class="text-center"><label>Nhiệt độ (°C)</label></p>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="dial-container">
+          <input id="humidity" type="text" class="dial" data-min="0" data-max="100" data-width="200" data-height="200"
+            data-thickness=".2" data-fgColor="#3399FF" data-displayPrevious=true readonly>
+          <p class="text-center"><label>Độ ẩm (%)</label></p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h2 class="text-center">Warning: <span id="warning"></span></h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <canvas id="temperatureChart"></canvas>
+      </div>
+      <div class="col-sm">
+        <canvas id="humidityChart"></canvas>
+      </div>
+      <div class="col-sm">
+        <canvas id="averageChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    $(function () {
+      $(".dial").knob({
+        'readOnly': true // Set readOnly option to true
+      });
+    });
+    const socket = io();
+    socket.on('data', (data) => {
+      $('#distance').val(data.distance).trigger('change');
+      $('#temperature').val(data.temperature).trigger('change');
+      $('#humidity').val(data.humidity).trigger('change');
+      $('#average').val(data.average).trigger('change');
+      $('#warning').text(data.warning);
+    });
+    // Add a click event listener to the reset button that sends a message to the server to reset the data
+    $('#reset-button').on('click', () => {
+      socket.emit('reset');
+    });
+    const temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+    const humidityCtx = document.getElementById('humidityChart').getContext('2d');
+    const averageCtx = document.getElementById('averageChart').getContext('2d');
+
+    const temperatureChart = new Chart(temperatureCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Nhiệt độ (°C)',
+          data: [],
+          borderColor: 'red',
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    const humidityChart = new Chart(humidityCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Độ ẩm (%)',
+          data: [],
+          borderColor: 'blue',
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    const averageChart = new Chart(averageCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Trung bình (m)',
+          data: [],
+          borderColor: 'green',
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    socket.on('data', (data) => {
+      // Add new data to the charts
+      temperatureChart.data.labels.push('');
+      temperatureChart.data.datasets[0].data.push(data.temperature);
+      temperatureChart.update();
+
+      humidityChart.data.labels.push('');
+      humidityChart.data.datasets[0].data.push(data.humidity);
+      humidityChart.update();
+
+      averageChart.data.labels.push('');
+      averageChart.data.datasets[0].data.push(data.average);
+      averageChart.update();
+    });
+  </script>
+</body>
+
+</html>

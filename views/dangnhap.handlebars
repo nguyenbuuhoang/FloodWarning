@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập</title>
+  <link rel="stylesheet" href="/css/dangnhap.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+  <section>
+
+    <div class="noi-dung">
+      <div class="form">
+        <h2>Trang Đăng Nhập</h2>
+        <form method="POST" action="/dangnhap">
+          <div class="input-form">
+            <span>UserName</span>
+            <input type="text" name="username" id="username" required autocomplete="username">
+          </div>
+          <div class="input-form">
+            <span>Password</span>
+            <input type="password" name="password" id="password" required autocomplete="current-password">
+          </div>
+          <div class="nho-dang-nhap">
+            <label><input type="checkbox" name=""> Nhớ Đăng Nhập</label>
+          </div>
+          <div class="input-form">
+            <input type="submit" value="Đăng Nhập">
+          </div>
+          <div class="input-form">
+            <p>Bạn Chưa Có Tài Khoản? <a href="/dangky">Đăng Ký</a></p>
+          </div>
+        </form>
+        {{#if message}}
+        <p>{{message}}</p>
+        {{/if}}
+        <h3>Đăng nhập bằng </h3>
+        <ul class="icon-dang-nhap">
+          <li><i class="fa fa-facebook" aria-hidden="true"></i></li>
+          <li><i class="fa fa-google" aria-hidden="true"></i></li>
+          <li><i class="fa fa-twitter" aria-hidden="true"></i></li>
+        </ul>
+      </div>
+    </div>
+    <div class="img-bg">
+      <img src="images/banner.png" alt="Hình Ảnh Minh Họa">
+    </div>
+  </section>
+</body>
+
+</html>

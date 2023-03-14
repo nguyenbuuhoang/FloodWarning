@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gioi thieu</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.knob/1.2.13/jquery.knob.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <style>
+        /* Định dạng menu */
+        nav {
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1;
+        }
+
+        nav ul {
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            list-style: none;
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* Định dạng header */
+        header {
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        header h3 {
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        /* Định dạng section chứa hình ảnh */
+        section img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Định dạng các card chứa thông tin */
+        .card {
+            border: none;
+            margin-top: 50px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .card-text {
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    {{> menu}}
+    <div class="container">
+        <header>
+            <h3>Hệ thống cảnh báo lũ sớm trên sông</h3>
+        </header>
+        <section>
+            <img src="/images/bg0001.jpg" alt="Hình Ảnh Minh Họa" style="width: 100%; height: 350px;">
+            <section>
+                <!-- Các cột chứa thông tin về Mục đích, Ý tưởng và Hướng phát triển -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Mục đích</h4>
+                                <p class="card-text">Đề tài được thực hiện nhằm giảm thiểu thiệt hại do lũ sớm và đảm
+                                    bảo an
+                                    toàn cho người dân và tài sản trên các sông.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Ý tưởng</h4>
+                                <p class="card-text">Sử dụng ESP32 cùng các cảm biến để đo mực nước trên sông,
+                                    từ đó
+                                    đưa ra cảnh báo qua email khi có nguy cơ lũ sớm.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Hướng phát triển</h4>
+                                <p class="card-text">Phát triển thêm các tính năng như ứng dụng di động để người dân có
+                                    thể xem
+                                    thông tin cảnh báo trực tiếp trên điện thoại.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+<footer class="bg-secondary py-3">
+  <div class="container">
+    <h4>Thành viên nhóm</h4>
+    <div class="row">
+      <div class="col-md-6">
+        <h5 class="d-flex align-items-center">
+          <img src="/images/avatar1.png" alt="Ảnh thành viên A" class="rounded-circle mr-2" style="width: 50px; height: 50px;">
+          Nguyễn Bửu Hoàng
+        </h5>
+        <p class="mb-0">Sđt: <br>
+          Email: <br>
+          SV <br>
+        </p>
+      </div>
+      <div class="col-md-6">
+        <h5 class="d-flex align-items-center">
+          <img src="/images/avatar2.png" alt="Ảnh thành viên B" class="rounded-circle mr-2" style="width: 50px; height: 50px;">
+          Võ Văn Khoa
+        </h5>
+        <p class="mb-0">Sđt: <br>
+          Email: <br>
+          SV <br>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+
+</html>
