@@ -126,7 +126,7 @@ function sendEmail(to, subject, text) {
 },60 *10 * 1000);
 
 // Route for homepage
-app.get('/home', (req, res) => {
+app.get('/', (req, res) => {
   const user = req.session.user;
   const username = user?.username;
   res.render('home', { username });
