@@ -1,56 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập</title>
-  <link rel="stylesheet" href="/css/dangnhap.css">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<title></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link href="css/popuo-box.css" rel="stylesheet" type="text/css" media="all" />
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="all">
+	<link href="//fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
 </head>
 
 <body>
-  <section>
+	<h1>EXISTING LOGIN FORM</h1>
+	<div class="w3layoutscontaineragileits">
+		<h2>Login here</h2>
+		<form action="#" method="post">
+			<input type="text" name="username" placeholder="Tên Đăng Nhập" id="username" required
+				autocomplete="username">
+			<input type="password" name="password" placeholder="Mật Khẩu" id="password" required
+				autocomplete="current-password">
 
-    <div class="noi-dung">
-      <div class="form">
-        <h2>Trang Đăng Nhập</h2>
-        <form method="POST" action="/dangnhap">
-          <div class="input-form">
-            <span>UserName</span>
-            <input type="text" name="username" id="username" required autocomplete="username">
-          </div>
-          <div class="input-form">
-            <span>Password</span>
-            <input type="password" name="password" id="password" required autocomplete="current-password">
-          </div>
-          <div class="nho-dang-nhap">
-            <label><input type="checkbox" name=""> Nhớ Đăng Nhập</label>
-          </div>
-          <div class="input-form">
-            <input type="submit" value="Đăng Nhập">
-          </div>
-          <div class="input-form">
-            <p>Bạn Chưa Có Tài Khoản? <a href="/dangky">Đăng Ký</a></p>
-          </div>
-        </form>
-        {{#if message}}
-        <p>{{message}}</p>
-        {{/if}}
-        <h3>Đăng nhập bằng </h3>
-        <ul class="icon-dang-nhap">
-          <li><i class="fa fa-facebook" aria-hidden="true"></i></li>
-          <li><i class="fa fa-google" aria-hidden="true"></i></li>
-          <li><i class="fa fa-twitter" aria-hidden="true"></i></li>
-        </ul>
-      </div>
-    </div>
-    <div class="img-bg">
-      <img src="images/banner.png" alt="Hình Ảnh Minh Họa">
-    </div>
-  </section>
+			<ul class="agileinfotickwthree">
+				<li>
+					<input type="checkbox" id="brand1" value="">
+					<label for="brand1"><span></span>Remember me</label>
+					<a href="#">Forgot password?</a>
+				</li>
+			</ul>
+
+			<div class="aitssendbuttonw3ls">
+				<input type="submit" value="LOGIN">
+				<p>Bạn Chưa Có Tài Khoản? <span>→</span> <a href="/dangky">Đăng Ký</a></p>
+				<div class="clear"></div>
+			</div>
+		</form>
+	</div>
+
+
+	<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+
+	<!-- pop-up-box-js-file -->
+	<script src="js/jquery.magnific-popup.js" type="text/javascript"></script>
+	<!--//pop-up-box-js-file -->
+
 </body>
 
 </html>

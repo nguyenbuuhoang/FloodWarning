@@ -126,7 +126,7 @@ function sendEmail(to, subject, text) {
 },60 *10 * 1000);
 
 // Route for homepage
-app.get('/home', (req, res) => {
+app.get('/', (req, res) => {
   const user = req.session.user;
   const username = user?.username;
   res.render('home', { username });
@@ -213,7 +213,7 @@ app.post('/dangnhap', async (req, res) => {
       if (match) {
         console.log(`User ${username} logged in`);
         req.session.user = { id: user.id, username: user.username };
-        res.redirect('/home');
+        res.redirect('/');
       } else {
         res.render('dangnhap', { message: 'Mật khẩu không chính xác' });
       }
@@ -254,6 +254,7 @@ app.get('/history', requireAuth, (req, res) => {
 });
 
 // Start the server
-server.listen(3000, () => {
-  console.log('Server is listening on port 3000');
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
 });
