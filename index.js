@@ -236,7 +236,7 @@ app.get('/logout', (req, res) => {
       console.error(err);
     } else {
       // homepage
-      res.redirect('/home');
+      res.redirect('/');
     }
   });
 });
