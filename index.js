@@ -63,8 +63,10 @@ ref.on('value', (snapshot) => {
 
 // Set the interval to 10 minutes
 setInterval(() => {
-  const timeString = new Date().toLocaleTimeString('en-US', {hour12: false});
-  const dateString = new Date().toLocaleDateString();
+  const moment = require('moment-timezone');
+  const timeString = moment().tz('Asia/Ho_Chi_Minh').format('HH:mm:ss');
+  const dateString = moment().tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY');
+  
 
   // Add the data to the "history" node in Firebase Realtime Database
   const historyRef = db.ref('history');
@@ -244,7 +246,7 @@ app.get('/logout', (req, res) => {
       console.error(err);
     } else {
       // homepage
-      res.redirect('/home');
+      res.redirect('/');
     }
   });
 });
