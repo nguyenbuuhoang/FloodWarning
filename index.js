@@ -63,28 +63,54 @@ ref.on('value', (snapshot) => {
 
 // Set the interval to 10 minutes
 setInterval(() => {
-  const moment = require('moment-timezone');
-  const timeString = moment().tz('Asia/Ho_Chi_Minh').format('HH:mm:ss');
-  const dateString = moment().tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY');
-  
-
+  const timeString = new Date().toLocaleTimeString('en-US', { hour12: false });
+  const dateString = new Date().toLocaleDateString();
   // Add the data to the "history" node in Firebase Realtime Database
   const historyRef = db.ref('history');
-  historyRef.push({
-    distance: distance,
-    temperature: temperature,
-    humidity: humidity,
-    average: average,
-    warning: warning,
-    time: timeString,
-    date: dateString
-  }, (err) => {
-    if (err) {
+  const limit = 1;
+  historyRef
+    .orderByChild('time')
+    .limitToLast(limit)
+    .once('value')
+    .then(snapshot => {
+      let dataExists = false;
+      snapshot.forEach(childSnapshot => {
+        const childData = childSnapshot.val();
+        if (
+          childData.distance === distance &&
+          childData.temperature === temperature &&
+          childData.humidity === humidity &&
+          childData.average === average &&
+          childData.warning === warning
+        ) {
+          dataExists = true;
+          console.log('Cảm biến chưa được bật, không thể truy xuất dữ liệu');
+        }
+      });
+
+      if (!dataExists) {
+        // Thêm dữ liệu mới vào Firebase Realtime Database
+        historyRef.push({
+          distance: distance,
+          temperature: temperature,
+          humidity: humidity,
+          average: average,
+          warning: warning,
+          time: timeString,
+          date: dateString
+        }, (err) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log('Lưu dữ liệu vào Firebase Realtime Database');
+          }
+        });
+      }
+    })
+    .catch(err => {
       console.error(err);
-    } else {
-      console.log('Saved data to Firebase Realtime Database');
-    }
-  });
+    });
+
   if (warning === 3) {
     // Get a list of all users with registered email addresses
     const usersRef = db.ref('users');
@@ -94,7 +120,7 @@ setInterval(() => {
       Object.keys(users).forEach((userId) => {
         const user = users[userId];
         if (user.email) {
-          sendEmail(user.email, 'cảnh báo',`Chào ${user.username},
+          sendEmail(user.email, 'cảnh báo', `Chào ${user.username},
 Mực nước đang ở mức báo động, cảnh báo đang ở mức level ${warning},
 Khoảng cách hiện tại ${average} cm, bạn cần di tản gấp
 Thời điểm ghi nhận  ${timeString},ngày ${dateString}`);
@@ -102,30 +128,30 @@ Thời điểm ghi nhận  ${timeString},ngày ${dateString}`);
       });
     });
   }
-// Create a transporter to send emails
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'floodwarning1105@gmail.com',
-    pass: 'glhpwnprnxnclvzc'
-  }
-});
-function sendEmail(to, subject, text) {
-  const mailOptions = {
-    from: 'floodwarning1105@gmail.com',
-    to,
-    subject,
-    text
-  };
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log('Error sending email:', error);
-    } else {
-      console.log('Email sent:', info.response);
+  // Create a transporter to send emails
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'floodwarning1105@gmail.com',
+      pass: 'glhpwnprnxnclvzc'
     }
   });
-}
-},60 *10 * 1000);
+  function sendEmail(to, subject, text) {
+    const mailOptions = {
+      from: 'floodwarning1105@gmail.com',
+      to,
+      subject,
+      text
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+  }
+}, 60 * 10 * 1000);
 
 // Route for homepage
 app.get('/', (req, res) => {
@@ -199,10 +225,6 @@ app.post('/dangky', async (req, res) => {
     res.send({ success: false, message: 'Lỗi đăng ký' });
   }
 });
-
-
-
-
 // Route for login form
 app.get('/dangnhap', (req, res) => {
   res.render('dangnhap');
@@ -261,6 +283,19 @@ app.get('/history', requireAuth, (req, res) => {
     const username = user?.username;
     res.render('history', { historyData, username: username });
   });
+});
+// Route to handle delete requests
+app.post('/history/delete', requireAuth, (req, res) => {
+  const key = req.body.key;
+  const historyRef = db.ref('history/' + key);
+  historyRef.remove()
+    .then(() => {
+      res.redirect('/history');
+    })
+    .catch((err) => {
+      console.log(err);
+      res.redirect('/history');
+    });
 });
 
 // Start the server
