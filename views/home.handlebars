@@ -22,7 +22,10 @@
   {{> menu}}
   <div class="container">
     <h1 class="text-center my-5">HỆ THỐNG CẢNH BÁO LŨ</h1>
-    <div class="row">
+    <div class="row justify-content-center">
+       <div class="col-3">
+        <canvas id="distanceChart"></canvas>
+      </div>
       <div class="col-3">
         <div class="dial-container">
           <input id="distance" type="text" class="dial" data-min="0" data-max="200" data-width="200" data-height="200"
@@ -36,6 +39,14 @@
             data-thickness=".2" data-fgColor="#FF6699" data-displayPrevious=true readonly>
           <p class="text-center"><label>Trung bình</label></p>
         </div>
+      </div>
+            <div class="col-3">
+        <canvas id="averageChart"></canvas>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+            <div class="col-3">
+        <canvas id="temperatureChart"></canvas>
       </div>
       <div class="col-3">
         <div class="dial-container">
@@ -51,6 +62,9 @@
           <p class="text-center"><label>Độ ẩm (%)</label></p>
         </div>
       </div>
+            <div class="col-3">
+        <canvas id="humidityChart"></canvas>
+      </div>
     </div>
     <div class="row">
       <div class="col">
@@ -58,15 +72,9 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-sm">
-        <canvas id="temperatureChart"></canvas>
-      </div>
-      <div class="col-sm">
-        <canvas id="humidityChart"></canvas>
-      </div>
-      <div class="col-sm">
-        <canvas id="averageChart"></canvas>
-      </div>
+
+
+
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -91,7 +99,7 @@
     const temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
     const humidityCtx = document.getElementById('humidityChart').getContext('2d');
     const averageCtx = document.getElementById('averageChart').getContext('2d');
-
+    const distanceCtx = document.getElementById('distanceChart').getContext('2d');
     const temperatureChart = new Chart(temperatureCtx, {
       type: 'line',
       data: {
@@ -142,7 +150,22 @@
         maintainAspectRatio: false
       }
     });
-
+const distanceChart = new Chart(distanceCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Khoang Cach (m)',
+          data: [],
+          borderColor: 'Brown',
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
     socket.on('data', (data) => {
       // Add new data to the charts
       temperatureChart.data.labels.push('');
@@ -156,8 +179,11 @@
       averageChart.data.labels.push('');
       averageChart.data.datasets[0].data.push(data.average);
       averageChart.update();
+      
+            distanceChart.data.labels.push('');
+      distanceChart.data.datasets[0].data.push(data.distance);
+      distanceChart.update();
     });
   </script>
 </body>
-
 </html>
