@@ -38,6 +38,30 @@ app.set('view engine', 'handlebars');
 // Set up static files
 app.use(express.static('public'));
 
+// Create a transporter to send emails
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'floodwarning1105@gmail.com',
+    pass: 'glhpwnprnxnclvzc'
+  }
+});
+function sendEmail(to, subject, text) {
+  const mailOptions = {
+    from: 'floodwarning1105@gmail.com',
+    to,
+    subject,
+    text
+  };
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+}
+
 // Get a database reference
 const db = admin.database();
 const ref = db.ref('IoT');
@@ -110,7 +134,6 @@ setInterval(() => {
     .catch(err => {
       console.error(err);
     });
-
   if (warning === 3) {
     // Get a list of all users with registered email addresses
     const usersRef = db.ref('users');
@@ -121,37 +144,15 @@ setInterval(() => {
         const user = users[userId];
         if (user.email) {
           sendEmail(user.email, 'cảnh báo', `Chào ${user.username},
-Mực nước đang ở mức báo động, cảnh báo đang ở mức level ${warning},
-Khoảng cách hiện tại ${average} cm, bạn cần di tản gấp
-Thời điểm ghi nhận  ${timeString},ngày ${dateString}`);
+    Mực nước đang ở mức báo động, cảnh báo đang ở mức level ${warning},
+    Khoảng cách hiện tại ${average} cm, bạn cần di tản gấp
+    Thời điểm ghi nhận  ${timeString},ngày ${dateString}`);
         }
       });
     });
   }
-  // Create a transporter to send emails
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'floodwarning1105@gmail.com',
-      pass: 'glhpwnprnxnclvzc'
-    }
-  });
-  function sendEmail(to, subject, text) {
-    const mailOptions = {
-      from: 'floodwarning1105@gmail.com',
-      to,
-      subject,
-      text
-    };
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log('Error sending email:', error);
-      } else {
-        console.log('Email sent:', info.response);
-      }
-    });
-  }
-}, 60 * 10 * 1000);
+
+}, 60* 10 * 1000);
 
 // Route for homepage
 app.get('/', (req, res) => {
