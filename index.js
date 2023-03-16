@@ -172,9 +172,15 @@ app.post('/dangky', async (req, res) => {
     // Check if username already exists in Firebase Realtime Database
     const ref = db.ref('users');
     const snapshot = await ref.orderByChild('username').equalTo(username).once('value');
-    if (snapshot.exists()) {
-      res.render('dangky', { message: 'Tên đăng nhập đã được đăng ký' });
-    } else {
+    const emailSnapshot = await ref.orderByChild('email').equalTo(email).once('value');
+    if (snapshot.exists() && emailSnapshot.exists()) {
+      res.send({ success: false, message: 'Tên đăng nhập và Email đã được đăng ký' });
+    } else if (snapshot.exists()) {
+      res.send({ success: false, message: 'Tên đăng nhập đã được đăng ký' });
+    } else if (emailSnapshot.exists()) {
+      res.send({ success: false, message: 'Email đã được đăng ký' });
+    }
+    else {
       // Hash password with bcrypt
       const hashedPassword = await bcrypt.hash(password, 10);
       // Create new user in Firebase Realtime Database
@@ -184,13 +190,14 @@ app.post('/dangky', async (req, res) => {
         password: hashedPassword // Store hashed password in database
       });
       console.log(`User ${username} with ID ${userRef.key} created`);
-      res.redirect('/dangnhap');
+      res.send({ success: true, message: 'Đăng ký thành công' });
     }
   } catch (error) {
     console.error('Error registering user:', error);
-    res.render('dangky', { message: 'Error registering user' });
+    res.send({ success: false, message: 'Lỗi đăng ký' });
   }
 });
+
 
 
 
@@ -213,18 +220,19 @@ app.post('/dangnhap', async (req, res) => {
       if (match) {
         console.log(`User ${username} logged in`);
         req.session.user = { id: user.id, username: user.username };
-        res.redirect('/');
+        res.send({ success: true, message: 'Đăng nhập thành công' }); // send response as JSON
       } else {
-        res.render('dangnhap', { message: 'Mật khẩu không chính xác' });
+        res.send({ success: false, message: 'Mật khẩu không chính xác' });
       }
     } else {
-      res.render('dangnhap', { message: 'Người dùng không tồn tại' });
+      res.send({ success: false, message: 'Người dùng không tồn tại' });
     }
   } catch (error) {
     console.error('Error logging in user:', error);
-    res.render('dangnhap', { message: 'Error logging in user' });
+    res.send({ success: false, message: 'Error logging in user' });
   }
 });
+
 
 
 
@@ -236,7 +244,7 @@ app.get('/logout', (req, res) => {
       console.error(err);
     } else {
       // homepage
-      res.redirect('/');
+      res.redirect('/home');
     }
   });
 });
