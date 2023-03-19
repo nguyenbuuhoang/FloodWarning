@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Flood warning</title>
@@ -11,10 +12,18 @@
   <style>
     .dial-container {
       display: inline-block;
-      margin-right: 25px;
       margin-bottom: 25px;
     }
-    
+
+    .chart-container {
+      width: 100%;
+      height: 200px;
+    }
+
+    .dial {
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 
@@ -22,48 +31,48 @@
   {{> menu}}
   <div class="container">
     <h1 class="text-center my-5">HỆ THỐNG CẢNH BÁO LŨ</h1>
-    <div class="row justify-content-center">
-       <div class="col-3">
-        <canvas id="distanceChart"></canvas>
+    <div class="row">
+      <div class="col-12 col-lg-6 col-xl-3">
+        <canvas id="distanceChart" class="chart-container"></canvas>
       </div>
-      <div class="col-3">
+      <div class="col-12 col-lg-6 col-xl-3">
         <div class="dial-container">
-          <input id="distance" type="text" class="dial" data-min="0" data-max="200" data-width="200" data-height="200"
-            data-thickness=".2" data-fgColor="#66CC66" data-displayPrevious=true readonly>
+          <input id="distance" type="text" class="dial" data-min="0" data-max="200" data-thickness=".2"
+            data-fgColor="#66CC66" data-displayPrevious=true readonly>
           <p class="text-center"><label>Khoảng cách (cm)</label></p>
         </div>
       </div>
-      <div class="col-3">
+      <div class="col-12 col-lg-6 col-xl-3">
         <div class="dial-container">
-          <input id="average" type="text" class="dial" data-min="0" data-max="200" data-width="200" data-height="200"
-            data-thickness=".2" data-fgColor="#FF6699" data-displayPrevious=true readonly>
+          <input id="average" type="text" class="dial" data-min="0" data-max="200" data-thickness=".2"
+            data-fgColor="#FF6699" data-displayPrevious=true readonly>
           <p class="text-center"><label>Trung bình</label></p>
         </div>
       </div>
-            <div class="col-3">
-        <canvas id="averageChart"></canvas>
+      <div class="col-12 col-lg-6 col-xl-3">
+        <canvas id="averageChart" class="chart-container"></canvas>
       </div>
     </div>
-    <div class="row justify-content-center">
-            <div class="col-3">
-        <canvas id="temperatureChart"></canvas>
+    <div class="row">
+      <div class="col-12 col-lg-6 col-xl-3">
+        <canvas id="temperatureChart" class="chart-container"></canvas>
       </div>
-      <div class="col-3">
+      <div class="col-12 col-lg-6 col-xl-3">
         <div class="dial-container">
-          <input id="temperature" type="text" class="dial" data-min="0" data-max="100" data-width="200"
-            data-height="200" data-thickness=".2" data-fgColor="#FFCC33" data-displayPrevious=true readonly>
+          <input id="temperature" type="text" class="dial" data-min="0" data-max="100" data-thickness=".2"
+            data-fgColor="#FFCC33" data-displayPrevious=true readonly>
           <p class="text-center"><label>Nhiệt độ (°C)</label></p>
         </div>
       </div>
-      <div class="col-3">
+      <div class="col-12 col-lg-6 col-xl-3">
         <div class="dial-container">
-          <input id="humidity" type="text" class="dial" data-min="0" data-max="100" data-width="200" data-height="200"
-            data-thickness=".2" data-fgColor="#3399FF" data-displayPrevious=true readonly>
+          <input id="humidity" type="text" class="dial" data-min="0" data-max="100" data-thickness=".2"
+            data-fgColor="#3399FF" data-displayPrevious=true readonly>
           <p class="text-center"><label>Độ ẩm (%)</label></p>
         </div>
       </div>
-            <div class="col-3">
-        <canvas id="humidityChart"></canvas>
+      <div class="col-12 col-lg-6 col-xl-3">
+        <canvas id="humidityChart" class="chart-container"></canvas>
       </div>
     </div>
     <div class="row">
@@ -71,12 +80,6 @@
         <h2 class="text-center">Warning: <span id="warning"></span></h2>
       </div>
     </div>
-    <div class="row">
-
-
-
-    </div>
-  </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     $(function () {
@@ -150,7 +153,7 @@
         maintainAspectRatio: false
       }
     });
-const distanceChart = new Chart(distanceCtx, {
+    const distanceChart = new Chart(distanceCtx, {
       type: 'line',
       data: {
         labels: [],
@@ -179,11 +182,12 @@ const distanceChart = new Chart(distanceCtx, {
       averageChart.data.labels.push('');
       averageChart.data.datasets[0].data.push(data.average);
       averageChart.update();
-      
-            distanceChart.data.labels.push('');
+
+      distanceChart.data.labels.push('');
       distanceChart.data.datasets[0].data.push(data.distance);
       distanceChart.update();
     });
   </script>
 </body>
+
 </html>
