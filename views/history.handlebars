@@ -51,7 +51,6 @@
           <th>Humidity</th>
           <th>Warning</th>
           <th>Date Time</th>
-          <th>Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -63,15 +62,6 @@
           <td>{{this.humidity}}</td>
           <td>{{this.warning}}</td>
           <td>{{this.date}} {{this.time}}</td>
-          <td class="text-center">
-            <form method="POST" action="/history/delete">
-              <input type="hidden" name="key" value="{{@key}}">
-              <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash fa-lg text-white"></i>
-              </button>
-
-            </form>
-          </td>
         </tr>
         {{/each}}
       </tbody>
