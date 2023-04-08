@@ -5,7 +5,6 @@
   <title>History</title>
   <!-- Thêm các thẻ CSS của Bootstrap -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
   <!-- Thêm các thẻ JavaScript của Bootstrap -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/jquery.knob/1.2.13/jquery.knob.min.js"></script>
@@ -14,7 +13,7 @@
   <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+ 
   <style>
     table {
       border-collapse: collapse;
@@ -31,33 +30,32 @@
     tr:nth-child(even) {
       background-color: #f2f2f2;
     }
-
     button {
       float: right;
     }
   </style>
   <script>
-    $(document).ready(function () {
-      $('#history-table').DataTable();
+    $(document).ready(function() {
+     $('#history-table').DataTable();
 
-      $('#export-button').click(function () {
+      $('#export-button').click(function() {
         // Lấy dữ liệu từ bảng DataTable
         var data = $('#history-table').DataTable().data().toArray();
-
+    
         // Thêm tiêu đề vào dữ liệu
         var header = ['Distance', 'Average', 'Temperature', 'Humidity', 'Warning', 'Date Time'];
         data.unshift(header);
 
         // Tạo một đối tượng Workbook mới
         var wb = XLSX.utils.book_new();
-
+    
         // Tạo một đối tượng Worksheet mới
         var ws = XLSX.utils.aoa_to_sheet(data);
-
-
+        
+    
         // Thêm Worksheet vào Workbook
         XLSX.utils.book_append_sheet(wb, ws, 'History Data');
-
+    
         // Xuất Workbook ra file Excel
         XLSX.writeFile(wb, 'history-data.xlsx');
       });
@@ -69,35 +67,31 @@
   {{> menu}}
   <div class="container mt-5">
     <h1>History</h1>
-    <form method="POST" action="/history/delete">
-      <table id="history-table" class="table table-striped mt-3">
-        <thead>
-          <tr>
-            <th>Distance</th>
-            <th>Average</th>
-            <th>Temperature</th>
-            <th>Humidity</th>
-            <th>Warning</th>
-            <th>Date Time</th>
-            <th>Select</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each historyData}}
-          <tr>
-            <td>{{this.distance}}</td>
-            <td>{{this.average}}</td>
-            <td>{{this.temperature}}</td>
-            <td>{{this.humidity}}</td>
-            <td>{{this.warning}}</td>
-            <td>{{this.date}} {{this.time}}</td>
-            <td class="text-center"><input type="checkbox" name="keys[]" value="{{@key}}"></td>
-          </tr>
-          {{/each}}
-        </tbody>
-      </table>
-      <button id="export-button" class="btn btn-primary" style="float: left; margin-top: 5px; margin-bottom: 10px;">Xuất ra Excel</button>
-      <button type="submit" class="btn btn-danger ">Delete Selected</button>
-    </form>
+    <button id="export-button" class="btn btn-primary">Xuất ra Excel</button>
+    <table id="history-table" class="table table-striped mt-3">
+      <thead>
+        <tr>
+          <th>Distance</th>
+          <th>Average</th>
+          <th>Temperature</th>
+          <th>Humidity</th>
+          <th>Warning</th>
+          <th>Date Time</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{#each historyData}}
+    <tr>
+      <td>{{this.distance}}</td>
+      <td>{{this.average}}</td>
+      <td>{{this.temperature}}</td>
+      <td>{{this.humidity}}</td>
+      <td>{{this.warning}}</td>
+      <td>{{this.date}} {{this.time}}</td>
+
+    </tr>
+    {{/each}}
+      </tbody>
+    </table>
   </div>
 </body>

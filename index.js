@@ -84,6 +84,10 @@ ref.on('value', (snapshot) => {
   // Send values to all connected clients
   io.emit('data', { distance, temperature, humidity, average, warning });
 });
+io.on('connection', (socket) => {
+  // Send latest values to the new client
+  socket.emit('data', { distance, temperature, humidity, average, warning });
+});
 
 // Set the interval to 10 minutes
 setInterval(() => {
@@ -144,15 +148,15 @@ setInterval(() => {
         const user = users[userId];
         if (user.email) {
           sendEmail(user.email, 'cảnh báo', `Chào ${user.username},
-    Mực nước đang ở mức báo động, cảnh báo đang ở mức level ${warning},
-    Khoảng cách hiện tại ${average} cm, bạn cần di tản gấp
-    Thời điểm ghi nhận  ${timeString},ngày ${dateString}`);
+Mực nước đang ở mức báo động, cảnh báo đang ở mức level ${warning},
+Khoảng cách hiện tại ${average} cm, bạn cần di tản gấp
+Thời điểm ghi nhận  ${timeString},ngày ${dateString}`);
         }
       });
     });
   }
 
-}, 60* 10 * 1000);
+}, 60 * 10 * 1000);
 
 // Route for homepage
 app.get('/', (req, res) => {
@@ -287,9 +291,18 @@ app.get('/history', requireAuth, (req, res) => {
 });
 // Route to handle delete requests
 app.post('/history/delete', requireAuth, (req, res) => {
-  const key = req.body.key;
-  const historyRef = db.ref('history/' + key);
-  historyRef.remove()
+  const keys = req.body.keys;
+  const promises = [];
+
+  if (!keys || !Array.isArray(keys)) {
+    res.redirect('/history');
+    return;
+  }
+  keys.forEach(key => {
+    const historyRef = db.ref('history/' + key);
+    promises.push(historyRef.remove());
+  });
+  Promise.all(promises)
     .then(() => {
       res.redirect('/history');
     })

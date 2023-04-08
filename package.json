@@ -21,6 +21,7 @@
     "handlebars": "^4.7.7",
     "http": "^0.0.1-security",
     "moment-timezone": "^0.5.41",
+    "node-localstorage": "^2.2.1",
     "nodemailer": "^6.9.1",
     "np-knob": "^2.0.1",
     "react-knob": "^0.1.0",

@@ -69,6 +69,7 @@
   {{> menu}}
   <div class="container mt-5">
     <h1>History</h1>
+    <button id="export-button" class="btn btn-primary">Xuất ra Excel</button>
     <form method="POST" action="/history/delete">
       <table id="history-table" class="table table-striped mt-3">
         <thead>
@@ -96,8 +97,7 @@
           {{/each}}
         </tbody>
       </table>
-      <button id="export-button" class="btn btn-primary" style="float: left; margin-top: 5px; margin-bottom: 10px;">Xuất ra Excel</button>
-      <button type="submit" class="btn btn-danger ">Delete Selected</button>
+      <button type="submit" class="btn btn-danger mt-3">Delete Selected</button>
     </form>
   </div>
 </body>
