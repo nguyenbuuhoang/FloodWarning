@@ -11,8 +11,17 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
     .dial-container {
-      display: inline-block;
-      margin-bottom: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid black;
+      padding: 10px;
+      margin-bottom: 5px;
+    }
+
+    .dial {
+      border-radius: 0;
     }
 
     .chart-container {
@@ -20,9 +29,8 @@
       height: 200px;
     }
 
-    .dial {
-      width: 100%;
-      height: 100%;
+    #map {
+      border: 2px solid black;
     }
   </style>
 </head>
@@ -30,57 +38,56 @@
 <body>
   {{> menu}}
   <div class="container">
-    <h1 class="text-center my-5">HỆ THỐNG CẢNH BÁO LŨ</h1>
+    <br></br>
     <div class="row">
-      <div class="col-12 col-lg-6 col-xl-3">
+      <div class="col-12 col-lg-6 col-xl-6">
+        <div id="map" style="width: 100%; height: 450px;"></div>
+      </div>
+      <div class="col-12 col-lg-6 col-xl-6">
+        <div class="row ">
+          <div class="col-6 col-lg-6 col-xl-5">
+            <div class="dial-container">
+              <input id="distance" type="text" class="dial" data-min="0" data-max="200" data-width="130"
+                data-height="150" data-thickness=".2" data-fgColor="#66CC66" data-displayPrevious=true readonly>
+              <p class="text-center"><label>Khoảng cách (cm)</label></p>
+            </div>
+          </div>
+          <div class="col-6 col-lg-6 col-xl-5">
+            <div class="dial-container">
+              <input id="average" type="text" class="dial" data-min="0" data-max="200" data-width="130"
+                data-height="150" data-thickness=".2" data-fgColor="#FF6699" data-displayPrevious=true readonly>
+              <p class="text-center"><label>Trung bình</label></p>
+            </div>
+          </div>
+        </div>
+        <div class="row ">
+          <div class="col-6 col-lg-6 col-xl-5">
+            <div class="dial-container">
+              <input id="temperature" type="text" class="dial" data-min="0" data-max="100" data-width="130"
+                data-height="150" data-height="200" data-thickness=".2" data-fgColor="#FFCC33" data-displayPrevious=true
+                readonly>
+              <p class="text-center"><label>Nhiệt độ (°C)</label></p>
+            </div>
+          </div>
+          <div class="col-6 col-lg-6 col-xl-5">
+            <div class="dial-container">
+              <input id="humidity" type="text" class="dial" data-min="0" data-max="100" data-width="130"
+                data-height="150" data-thickness=".2" data-fgColor="#3399FF" data-displayPrevious=true readonly>
+              <p class="text-center"><label>Độ ẩm (%)</label></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-lg-12 col-xl-12">
         <canvas id="distanceChart" class="chart-container"></canvas>
       </div>
-      <div class="col-6 col-lg-6 col-xl-3">
-        <div class="dial-container">
-          <input id="distance" type="text" class="dial" data-min="0" data-max="200" data-thickness=".2"
-            data-fgColor="#66CC66" data-displayPrevious=true readonly>
-          <p class="text-center"><label>Khoảng cách (cm)</label></p>
-        </div>
-      </div>
-      <div class="col-6 col-lg-6 col-xl-3">
-        <div class="dial-container">
-          <input id="average" type="text" class="dial" data-min="0" data-max="200" data-thickness=".2"
-            data-fgColor="#FF6699" data-displayPrevious=true readonly>
-          <p class="text-center"><label>Trung bình</label></p>
-        </div>
-      </div>
-      <div class="col-12 col-lg-6 col-xl-3">
-        <canvas id="averageChart" class="chart-container"></canvas>
-      </div>
     </div>
-    <div class="row">
-      <div class="col-12 col-lg-6 col-xl-3">
-        <canvas id="temperatureChart" class="chart-container"></canvas>
-      </div>
-      <div class="col-6 col-lg-6 col-xl-3">
-        <div class="dial-container">
-          <input id="temperature" type="text" class="dial" data-min="0" data-max="100" data-thickness=".2"
-            data-fgColor="#FFCC33" data-displayPrevious=true readonly>
-          <p class="text-center"><label>Nhiệt độ (°C)</label></p>
-        </div>
-      </div>
-      <div class="col-6 col-lg-6 col-xl-3">
-        <div class="dial-container">
-          <input id="humidity" type="text" class="dial" data-min="0" data-max="100" data-thickness=".2"
-            data-fgColor="#3399FF" data-displayPrevious=true readonly>
-          <p class="text-center"><label>Độ ẩm (%)</label></p>
-        </div>
-      </div>
-      <div class="col-12 col-lg-6 col-xl-3">
-        <canvas id="humidityChart" class="chart-container"></canvas>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <h2 class="text-center">Warning: <span id="warning"></span></h2>
-      </div>
-    </div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPCECUsEOf6Wakotqrki2EEBeL5tRpupU&callback=initMap"> </script>
   <script>
     $(function () {
       $(".dial").knob({
@@ -95,64 +102,68 @@
       $('#average').val(data.average).trigger('change');
       $('#warning').text(data.warning);
     });
-    // Add a click event listener to the reset button that sends a message to the server to reset the data
-    $('#reset-button').on('click', () => {
-      socket.emit('reset');
-    });
-    const temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
-    const humidityCtx = document.getElementById('humidityChart').getContext('2d');
-    const averageCtx = document.getElementById('averageChart').getContext('2d');
+    function initMap() {
+      // Tạo một đối tượng map mới
+      var myLatLng = { lat: 10.388677, lng: 105.423072 };
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: myLatLng
+      });
+
+      var marker = new google.maps.Marker({
+        position: myLatLng,
+        map: map,
+        title: 'Khu vực 1'
+      });
+      // Khởi tạo marker cho khu vực 2
+      var marker2 = new google.maps.Marker({
+        position: { lat: 10.384925, lng: 105.439820 },
+        map: map,
+        title: 'Khu vực 2'
+      });
+      var currentInfowindow = null;
+
+      // Thêm một sự kiện click vào marker để hiển thị các giá trị trong socket
+      marker.addListener("click", () => {
+        if (currentInfowindow) {
+          currentInfowindow.close();
+        }
+
+        const infowindow = new google.maps.InfoWindow({
+          content: `
+        <div>
+          <p>Khu vực 1</p>
+          <p>Distance: <span id="mapdistance"></span></p>
+          <p>Temperature: <span id="maptemperature"></span></p>
+          <p>Humidity: <span id="maphumidity"></span></p>
+          <p>Average: <span id="mapaverage"></span></p>
+          <p>Warning: <span id="mapwarning"></span></p>
+        </div>
+      `,
+        });
+
+        // Mở thông báo
+        infowindow.open({
+          anchor: marker,
+          map,
+          shouldFocus: false,
+        });
+
+        currentInfowindow = infowindow;
+
+        // Cập nhật các giá trị trong socket vào thông báo
+        const socket = io();
+        socket.on("data", (data) => {
+          $("#mapdistance").text(data.distance);
+          $("#maptemperature").text(data.temperature);
+          $("#maphumidity").text(data.humidity);
+          $("#mapaverage").text(data.average);
+          $("#mapwarning").text(data.warning);
+        });
+      });
+    }
+
     const distanceCtx = document.getElementById('distanceChart').getContext('2d');
-    const temperatureChart = new Chart(temperatureCtx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Nhiệt độ (°C)',
-          data: [],
-          borderColor: 'red',
-          fill: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-
-    const humidityChart = new Chart(humidityCtx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Độ ẩm (%)',
-          data: [],
-          borderColor: 'blue',
-          fill: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-
-    const averageChart = new Chart(averageCtx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Trung bình (m)',
-          data: [],
-          borderColor: 'green',
-          fill: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
     const distanceChart = new Chart(distanceCtx, {
       type: 'line',
       data: {
@@ -171,18 +182,6 @@
     });
     socket.on('data', (data) => {
       // Add new data to the charts
-      temperatureChart.data.labels.push('');
-      temperatureChart.data.datasets[0].data.push(data.temperature);
-      temperatureChart.update();
-
-      humidityChart.data.labels.push('');
-      humidityChart.data.datasets[0].data.push(data.humidity);
-      humidityChart.update();
-
-      averageChart.data.labels.push('');
-      averageChart.data.datasets[0].data.push(data.average);
-      averageChart.update();
-
       distanceChart.data.labels.push('');
       distanceChart.data.datasets[0].data.push(data.distance);
       distanceChart.update();
