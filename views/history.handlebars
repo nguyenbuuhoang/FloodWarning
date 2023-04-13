@@ -80,7 +80,6 @@
             <th>Humidity</th>
             <th>Warning</th>
             <th>Date Time</th>
-            <th>Select</th>
           </tr>
         </thead>
         <tbody>
@@ -92,13 +91,11 @@
             <td>{{this.humidity}}</td>
             <td>{{this.warning}}</td>
             <td>{{this.date}} {{this.time}}</td>
-            <td class="text-center"><input type="checkbox" name="keys[]" value="{{@key}}"></td>
           </tr>
           {{/each}}
         </tbody>
       </table>
       <button id="export-button" class="btn btn-primary" style="float: left; margin-top: 5px; margin-bottom: 10px;">Xuất ra Excel</button>
-      <button type="submit" class="btn btn-danger ">Delete Selected</button>
     </form>
   </div>
 </body>
