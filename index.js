@@ -91,13 +91,18 @@ io.on('connection', (socket) => {
 
 // Set the interval to 10 minutes
 setInterval(() => {
-  const timeString = new Date().toLocaleTimeString('en-US', { hour12: false });
-  const dateString = new Date().toLocaleDateString();
+  const date = new Date();
+  const options = { timeZone: 'Asia/Ho_Chi_Minh', hour12: false, year: 'numeric', month: '2-digit', day: '2-digit' };
+  const timeString = date.toLocaleTimeString('en-US', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false });
+  const dateString = date.toLocaleString('en-US', options);  
+  
+  // Ghép chuỗi ngày và giờ lại với nhau
+const dateTimeString = dateString + ' ' + timeString;
   // Add the data to the "history" node in Firebase Realtime Database
   const historyRef = db.ref('history');
   const limit = 1;
   historyRef
-    .orderByChild('time')
+    .orderByChild('datetime')
     .limitToLast(limit)
     .once('value')
     .then(snapshot => {
@@ -125,7 +130,8 @@ setInterval(() => {
           average: average,
           warning: warning,
           time: timeString,
-          date: dateString
+          date: dateString,
+          datetime: dateTimeString
         }, (err) => {
           if (err) {
             console.error(err);
@@ -156,7 +162,8 @@ Thời điểm ghi nhận  ${timeString},ngày ${dateString}`);
     });
   }
 
-}, 60 * 10 * 1000);
+}, 60*10 * 1000);
+
 
 // Route for homepage
 app.get('/', (req, res) => {
@@ -177,8 +184,21 @@ app.get('/gioithieu', requireAuth, (req, res) => {
 app.get('/charts', requireAuth, (req, res) => {
   const user = req.session.user;
   const username = user.username;
-  res.render('charts', { username });
+  const historyRef = db.ref('history');
+  // Lấy dữ liệu từ Firebase Realtime Database, sắp xếp theo thời gian và giới hạn 2 bản ghi cuối cùng
+  historyRef.orderByChild('datetime').limitToLast(2).once('value', (snapshot) => {
+    const data = snapshot.val();
+    const historyArr = Object.values(data);
+    const latestDistance = historyArr[1].average; // Lấy dữ liệu gần nhất
+    const secondLatestDistance = historyArr[0].average; // Lấy dữ liệu gần thứ hai
+    const warning = historyArr[1].warning;
+    const difference =latestDistance - secondLatestDistance; // Tính toán chênh lệch
+    // Render template và truyền dữ liệu vào view
+    res.render('charts', { username, latestDistance, warning, difference });
+  });
 });
+
+
 // Route for chart data
 app.get('/charts-data', (req, res) => {
   const historyRef = db.ref('history');
