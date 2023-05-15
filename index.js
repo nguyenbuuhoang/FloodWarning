@@ -303,9 +303,6 @@ app.post('/dangnhap', async (req, res) => {
   }
 });
 
-
-
-
 // Route for logout button
 app.get('/logout', (req, res) => {
   // Delete session users
