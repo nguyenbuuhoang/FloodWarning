@@ -9,7 +9,18 @@
   <script src="https://cdn.jsdelivr.net/jquery.knob/1.2.13/jquery.knob.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
   <style>
+    body {
+      background-image: url("/images/banner04.jpg");
+      z-index: -1;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      background-attachment: fixed;
+    }
+
+
     .dial-container {
       display: flex;
       flex-direction: column;
@@ -18,7 +29,9 @@
       border: 2px solid black;
       padding: 10px;
       margin-bottom: 5px;
+      background-color: white;
     }
+
 
     .dial {
       border-radius: 0;
@@ -27,10 +40,36 @@
     .chart-container {
       width: 100%;
       height: 200px;
+      margin-top: 5px;
+      border: 2px solid black;
+      background-color: rgb(214, 209, 209);
     }
 
     #map {
       border: 2px solid black;
+    }
+
+    .legend {
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .legend-square {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+
+    .legend-label {
+      font-size: 14px;
     }
   </style>
 </head>
@@ -86,8 +125,6 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQNKBlrMu1cxcil_xD7MnsbaVl5yfj5tY&callback=initMap"> </script>
   <script>
     $(function () {
       $(".dial").knob({
@@ -102,57 +139,67 @@
       $('#average').val(data.average).trigger('change');
       $('#warning').text(data.warning);
     });
+
     function initMap() {
-      // Tạo một đối tượng map mới
       var myLatLng = { lat: 10.388677, lng: 105.423072 };
-      var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 14,
-        center: myLatLng
-      });
+      var map = L.map('map').setView([myLatLng.lat, myLatLng.lng], 14);
 
-      var marker = new google.maps.Marker({
-        position: myLatLng,
-        map: map,
-        title: 'Khu vực 1'
-      });
-      // Khởi tạo marker cho khu vực 2
-      var marker2 = new google.maps.Marker({
-        position: { lat: 10.384925, lng: 105.439820 },
-        map: map,
-        title: 'Khu vực 2'
-      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        maxZoom: 18,
+      }).addTo(map);
+
+      var marker = L.marker([myLatLng.lat, myLatLng.lng]).addTo(map);
       var currentInfowindow = null;
-
-      // Thêm một sự kiện click vào marker để hiển thị các giá trị trong socket
-      marker.addListener("click", () => {
-        if (currentInfowindow) {
-          currentInfowindow.close();
+      const socket = io();
+      var circle = null;
+      socket.on("data", (data) => {
+        $("#mapwarning").text(data.warning);
+        var circleColor = "";
+        if (data.warning === 1) {
+          circleColor = "blue";
+        } else if (data.warning === 2) {
+          circleColor = "yellow";
+        } else if (data.warning === 3) {
+          circleColor = "red";
         }
 
-        const infowindow = new google.maps.InfoWindow({
-          content: `
-        <div>
-          <p>Khu vực 1: Cầu Tôn Đức Thắng</p>
-          <p>Distance: <span id="mapdistance"></span></p>
-          <p>Temperature: <span id="maptemperature"></span></p>
-          <p>Humidity: <span id="maphumidity"></span></p>
-          <p>Average: <span id="mapaverage"></span></p>
-          <p>Warning: <span id="mapwarning"></span></p>
-          <p><a href="/">Xem</a></p>
-        </div>
-      `,
-        });
+        if (circle) {
+          // Xóa vòng tròn hiện tại nếu tồn tại
+          map.removeLayer(circle);
+        }
 
-        // Mở thông báo
-        infowindow.open({
-          anchor: marker,
-          map,
-          shouldFocus: false,
-        });
+        circle = L.circle([myLatLng.lat, myLatLng.lng], {
+          color: circleColor,
+          fillColor: circleColor,
+          fillOpacity: 0.5,
+          radius: 300
+        }).addTo(map);
+      });
+
+
+      marker.on("click", () => {
+        if (currentInfowindow) {
+          currentInfowindow.remove();
+        }
+
+        const infowindow = L.popup()
+          .setContent(`
+    <div>
+      <p>Khu vực 1: Cầu Tôn Đức Thắng</p>
+      <p>Distance: <span id="mapdistance"></span></p>
+      <p>Temperature: <span id="maptemperature"></span></p>
+      <p>Humidity: <span id="maphumidity"></span></p>
+      <p>Average: <span id="mapaverage"></span></p>
+      <p>Warning: <span id="mapwarning"></span></p>
+      <p><a href="/">Xem</a></p>
+    </div>
+  `);
+
+        infowindow.setLatLng(marker.getLatLng()).openOn(map);
 
         currentInfowindow = infowindow;
 
-        // Cập nhật các giá trị trong socket vào thông báo
         const socket = io();
         socket.on("data", (data) => {
           $("#mapdistance").text(data.distance);
@@ -162,14 +209,44 @@
           $("#mapwarning").text(data.warning);
         });
       });
-      marker2.addListener("click", () => {
-  if (currentInfowindow) {
-    currentInfowindow.close();
+
+      var marker2 = L.marker([10.384925, 105.439820]).addTo(map);
+      var currentInfowindow2 = null;
+      const socket2 = io();
+      var circle2 = null; // Khởi tạo biến circle2 bên ngoài phạm vi sự kiện "data"
+
+socket2.on("data", (data) => {
+  $("#mapwarning2").text(data.warning);
+  var circleColor2 = "";
+  if (data.warning === 1) {
+    circleColor2 = "blue";
+  } else if (data.warning === 2) {
+    circleColor2 = "yellow";
+  } else if (data.warning === 3) {
+    circleColor2 = "red";
   }
 
-  const infowindow = new google.maps.InfoWindow({
-    content: `
-      <div>
+  if (circle2) {
+    // Xóa vòng tròn hiện tại nếu tồn tại
+    map.removeLayer(circle2);
+  }
+
+  circle2 = L.circle([10.384925, 105.439820], {
+    color: circleColor2,
+    fillColor: circleColor2,
+    fillOpacity: 0.5,
+    radius: 300
+  }).addTo(map);
+});
+
+      marker2.on("click", () => {
+        if (currentInfowindow2) {
+          currentInfowindow2.remove();
+        }
+
+        const infowindow2 = L.popup()
+          .setContent(`
+  <div>
         <p>Khu vực 2: Cầu Duy Tân</p>
         <p>Distance: <span id="mapdistance2"></span></p>
         <p>Temperature: <span id="maptemperature2"></span></p>
@@ -177,31 +254,51 @@
         <p>Average: <span id="mapaverage2"></span></p>
         <p>Warning: <span id="mapwarning2"></span></p>
         <p><a href="/home2">Xem</a></p>
+        </div>
+      `);
+
+        infowindow2.setLatLng(marker2.getLatLng()).openOn(map);
+
+        currentInfowindow2 = infowindow2;
+
+        const socket = io();
+        socket.on("data", (data) => {
+          $("#mapdistance2").text(data.distance);
+          $("#maptemperature2").text(data.temperature);
+          $("#maphumidity2").text(data.humidity);
+          $("#mapaverage2").text(data.average);
+          $("#mapwarning2").text(data.warning);
+        });
+      });
+      // Tạo bảng chú thích
+      var legend = L.control({ position: 'bottomleft' });
+
+      legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML = `
+      <div class="legend-item">
+        <div class="legend-square" style="background-color: blue;"></div>
+        <span class="legend-label">An Toàn > 60 cm</span>
       </div>
-    `,
-  });
+      <div class="legend-item">
+        <div class="legend-square" style="background-color: yellow;"></div>
+        <span class="legend-label">Có nguy cơ: từ 30-60cm </span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-square" style="background-color: red;"></div>
+        <span class="legend-label">Báo động: < 30cm</span>
+      </div>
+    `;
+        return div;
+      };
 
-  // Mở thông báo
-  infowindow.open({
-    anchor: marker2,
-    map,
-    shouldFocus: false,
-  });
-
-  currentInfowindow = infowindow;
-
-  // Cập nhật các giá trị trong socket vào thông báo
-  const socket = io();
-  socket.on("data", (data) => {
-    $("#mapdistance2").text(data.distance);
-    $("#maptemperature2").text(data.temperature);
-    $("#maphumidity2").text(data.humidity);
-    $("#mapaverage2").text(data.average);
-    $("#mapwarning2").text(data.warning);
-  });
-});
+      legend.addTo(map);
 
     }
+
+    window.onload = function () {
+      initMap();
+    };
 
     const distanceCtx = document.getElementById('distanceChart').getContext('2d');
     const distanceChart = new Chart(distanceCtx, {
@@ -226,6 +323,7 @@
       distanceChart.data.datasets[0].data.push(data.distance);
       distanceChart.update();
     });
+
   </script>
 </body>
 
